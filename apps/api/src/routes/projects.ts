@@ -34,10 +34,12 @@ export async function projectRoutes(app: FastifyInstance): Promise<void> {
     try {
       await enqueueAnalysis({ projectId, jobId: job.id });
     } catch (error) {
-      return reply.code(503).send({
-        error: "Queue unavailable",
-        detail: error instanceof Error ? error.message : String(error),
-        job
+      const report = await runAnalysis(projectId, job.id);
+      return reply.code(202).send({
+        job,
+        report,
+        mode: "synchronous-fallback",
+        queueWarning: error instanceof Error ? error.message : String(error)
       });
     }
     return reply.code(202).send({ job });
