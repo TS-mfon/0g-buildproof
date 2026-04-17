@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: 0g-buildproof-api
+    runtime: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    plan: starter
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: API_BASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: PRIVATE_KEY
+        sync: false
+      - key: OG_COMPUTE_ENDPOINT
+        sync: false
+      - key: OG_COMPUTE_KEY
+        sync: false
+      - key: OG_COMPUTE_MODEL
+        sync: false
+      - key: BUILDPROOF_REGISTRY_MAINNET
+        sync: false
+      - key: BUILDPROOF_REGISTRY_TESTNET
+        sync: false
+
+  - type: worker
+    name: 0g-buildproof-worker
+    runtime: docker
+    dockerfilePath: ./apps/worker/Dockerfile
+    plan: starter
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_BASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false

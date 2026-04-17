@@ -1,0 +1,16 @@
+node_modules
+.turbo
+.next
+dist
+out
+coverage
+.env
+.env.local
+.env.*.local
+cache
+broadcast
+contracts/cache
+contracts/out
+contracts/broadcast
+*.log
+*.tsbuildinfo

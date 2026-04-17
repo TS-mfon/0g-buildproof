@@ -1,0 +1,24 @@
+{
+  "name": "0g-buildproof",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Verifiable excellence passports for 0G builders.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "contracts:test": "forge test --root contracts",
+    "contracts:build": "forge build --root contracts"
+  },
+  "packageManager": "npm@10.9.4",
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}
