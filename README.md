@@ -409,10 +409,12 @@ Fill these before HackQuest submission:
 ```text
 0G mainnet registry contract: 0x45119A32ca6C4d67424401dA92Abe4EC6c83f8Ce
 0G mainnet Explorer link: https://chainscan.0g.ai/tx/0x35af72b28f166b455781f8fdaa06eb764c5d231fc5c0b165c16db4913be734dd
+0G registry project activity: https://chainscan.0g.ai/tx/0x55911abae2e242a0b207f915b5e44d22619ec242745923153be1645816674dbe
 0G Storage root:
 0G Compute model/provider:
+GitHub repository: https://github.com/TS-mfon/0g-buildproof
 Live Vercel app:
-Render API health endpoint:
+Render API health endpoint: https://zerog-buildproof-api.onrender.com/health
 Demo video:
 X post:
 ```
