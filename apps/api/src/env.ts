@@ -12,11 +12,7 @@ const envSchema = z.object({
   OG_MAINNET_RPC_URL: z.string().url().default("https://evmrpc.0g.ai"),
   OG_MAINNET_EXPLORER: z.string().url().default("https://chainscan.0g.ai"),
   OG_MAINNET_STORAGE_INDEXER: z.string().url().default("https://indexer-storage-turbo.0g.ai"),
-  OG_TESTNET_RPC_URL: z.string().url().default("https://evmrpc-testnet.0g.ai"),
-  OG_TESTNET_EXPLORER: z.string().url().default("https://chainscan-galileo.0g.ai"),
-  OG_TESTNET_STORAGE_INDEXER: z.string().url().default("https://indexer-storage-testnet-turbo.0g.ai"),
   BUILDPROOF_REGISTRY_MAINNET: z.string().optional(),
-  BUILDPROOF_REGISTRY_TESTNET: z.string().optional(),
   OG_COMPUTE_ENDPOINT: z.string().url().optional(),
   OG_COMPUTE_KEY: z.string().optional(),
   OG_COMPUTE_MODEL: z.string().optional()

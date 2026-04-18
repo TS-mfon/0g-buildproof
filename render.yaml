@@ -31,8 +31,6 @@ services:
         sync: false
       - key: BUILDPROOF_REGISTRY_MAINNET
         sync: false
-      - key: BUILDPROOF_REGISTRY_TESTNET
-        sync: false
 
   - type: worker
     name: 0g-buildproof-worker

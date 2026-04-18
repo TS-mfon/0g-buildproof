@@ -18,7 +18,10 @@ export async function inspectGitHubRepo(githubUrl: string): Promise<GitHubInspec
   }
   const [, owner, repoWithSuffix] = match;
   const repo = repoWithSuffix.replace(/\.git$/, "");
-  const headers: Record<string, string> = { Accept: "application/vnd.github+json" };
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "0g-buildproof"
+  };
   if (env.GITHUB_TOKEN) headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
 
   try {

@@ -1,10 +1,10 @@
 # 0G BuildProof
 
-0G BuildProof is a verifiable quality and reputation layer for 0G ecosystem projects. Builders submit a repository, demo, 0G contract address, and Explorer proof. AI agents review the submission, generate a BuildProof Passport, store the report on 0G Storage, and anchor the report hash on 0G Chain.
+0G BuildProof is a verifiable quality and reputation layer for 0G ecosystem projects. Builders submit a repository, demo, 0G mainnet contract address, and Explorer proof. AI agents review the submission, generate a BuildProof Passport, upload the report bundle to 0G Storage, and anchor the report hash through a 0G mainnet registry.
 
 ## One-Sentence Description
 
-0G BuildProof verifies project integrations, scores technical quality, and stores builder reputation using AI agents, 0G Storage, Compute, and Chain.
+0G BuildProof verifies project integrations, scores technical quality, and stores builder reputation using AI agents, 0G Storage, 0G Compute, and 0G Chain.
 
 ## Problem
 
@@ -26,7 +26,7 @@ Hackathons and ecosystem programs need a faster way to distinguish serious proje
 ## Product Demo Flow
 
 1. Builder opens the Vercel app.
-2. Builder submits project name, wallet, GitHub repo, demo link, 0G contract address, Explorer link, target network, and claimed 0G modules.
+2. Builder submits project name, wallet, GitHub repo, demo link, 0G mainnet contract address, Explorer link, and claimed 0G modules.
 3. Render API creates an analysis job.
 4. Render worker runs the BuildProof agent pipeline.
 5. The report is uploaded to 0G Storage.
@@ -37,15 +37,15 @@ Hackathons and ecosystem programs need a faster way to distinguish serious proje
 
 ### 0G Chain
 
-`BuildProofRegistry` stores compact verification metadata: project owner, URLs, submitted contract, storage root, report hash, score summary, status, endorsements, and flags. Full reports are not stored on-chain.
+`BuildProofRegistry` stores compact verification metadata: project owner, URLs, submitted contract, storage root, report hash, score summary, status, endorsements, and flags. Full reports are not stored on-chain. This build is mainnet-only.
 
 ### 0G Storage
 
-Full BuildProof reports, agent findings, evidence bundles, and historical passport versions are stored on 0G Storage. The registry stores only the returned storage root and report hash.
+Full BuildProof reports, agent findings, evidence bundles, and historical passport versions are uploaded through `@0gfoundation/0g-ts-sdk`. A project is marked `Storage Verified` only when the SDK returns a real root hash.
 
 ### 0G Compute
 
-The agent pipeline is routed through `compute0g.ts`. Production deployments should configure `OG_COMPUTE_ENDPOINT`, `OG_COMPUTE_KEY`, and `OG_COMPUTE_MODEL`. Development fallback is explicitly marked and must not be represented as final 0G Compute proof.
+The agent pipeline is routed through `compute0g.ts`. Deployments must configure `OG_COMPUTE_ENDPOINT`, `OG_COMPUTE_KEY`, and `OG_COMPUTE_MODEL` to mark Compute as verified. If these values are absent or the endpoint fails, the report is still generated, but `0G Compute` is not included in `verifiedModules`.
 
 ### Agent Identity
 
@@ -67,12 +67,12 @@ Browser
   -> Render API service
   -> Render worker service
   -> GitHub API
-  -> 0G Compute
   -> 0G Storage
   -> 0G Chain
+  -> optional 0G Compute endpoint when configured
 ```
 
-The current implementation includes an in-memory development store so the product can be exercised locally before wiring Render Postgres. The deployment plan reserves `DATABASE_URL` and `REDIS_URL` for production persistence and job orchestration.
+The current implementation uses the Render API process as the source of truth for submitted projects and reports. `DATABASE_URL` and `REDIS_URL` are reserved for production persistence and background job orchestration.
 
 ## Monorepo Structure
 
@@ -83,7 +83,7 @@ apps/worker    Render background worker
 contracts      Foundry registry contract
 packages/shared Shared schemas, scoring, and constants
 docs           Deployment and judging notes
-scripts        Verification and demo helper placeholders
+scripts        Verification helpers
 ```
 
 ## Smart Contract
@@ -156,8 +156,7 @@ Every agent produces evidence-bound JSON. No finding should appear without a lin
 - **DocsReviewer:** checks README, architecture notes, setup, and reproducibility.
 - **DemoReviewer:** checks demo presence and whether final video can show real 0G usage.
 - **SecurityReviewer:** checks obvious secret hygiene and deployment risks.
-- **CommunityMentor:** creates improvement tasks and ecosystem contribution ideas.
-- **JudgeSummarizer:** condenses evidence into a judge-facing verdict.
+- **CommunityMentor:** creates improvement tasks and ecosystem contribution ideas. When 0G Compute is configured, this review is backed by the Compute endpoint.
 
 ## Scoring Rubric
 
@@ -248,7 +247,6 @@ NEXT_PUBLIC_0G_MAINNET_CHAIN_ID=16661
 NEXT_PUBLIC_0G_MAINNET_RPC_URL=https://evmrpc.0g.ai
 NEXT_PUBLIC_0G_MAINNET_EXPLORER=https://chainscan.0g.ai
 NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=
-NEXT_PUBLIC_BUILDPROOF_REGISTRY_TESTNET=
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
 ```
 
@@ -261,13 +259,10 @@ GITHUB_TOKEN=
 PRIVATE_KEY=
 OG_MAINNET_RPC_URL=https://evmrpc.0g.ai
 OG_MAINNET_STORAGE_INDEXER=https://indexer-storage-turbo.0g.ai
-OG_TESTNET_RPC_URL=https://evmrpc-testnet.0g.ai
-OG_TESTNET_STORAGE_INDEXER=https://indexer-storage-testnet-turbo.0g.ai
 OG_COMPUTE_ENDPOINT=
 OG_COMPUTE_KEY=
 OG_COMPUTE_MODEL=
 BUILDPROOF_REGISTRY_MAINNET=
-BUILDPROOF_REGISTRY_TESTNET=
 ```
 
 ## Data Needed Before Final Deployment
@@ -357,7 +352,6 @@ OG_COMPUTE_ENDPOINT=
 OG_COMPUTE_KEY=
 OG_COMPUTE_MODEL=
 BUILDPROOF_REGISTRY_MAINNET=
-BUILDPROOF_REGISTRY_TESTNET=
 ```
 
 ## Vercel Deployment
@@ -382,7 +376,6 @@ NEXT_PUBLIC_0G_MAINNET_CHAIN_ID=16661
 NEXT_PUBLIC_0G_MAINNET_RPC_URL=https://evmrpc.0g.ai
 NEXT_PUBLIC_0G_MAINNET_EXPLORER=https://chainscan.0g.ai
 NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=
-NEXT_PUBLIC_BUILDPROOF_REGISTRY_TESTNET=
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
 ```
 
@@ -410,8 +403,8 @@ Fill these before HackQuest submission:
 0G mainnet registry contract: 0x45119A32ca6C4d67424401dA92Abe4EC6c83f8Ce
 0G mainnet Explorer link: https://chainscan.0g.ai/tx/0x35af72b28f166b455781f8fdaa06eb764c5d231fc5c0b165c16db4913be734dd
 0G registry project activity: https://chainscan.0g.ai/tx/0x55911abae2e242a0b207f915b5e44d22619ec242745923153be1645816674dbe
-0G Storage root:
-0G Compute model/provider:
+0G Storage root: generated per submitted project after analysis
+0G Compute model/provider: requires OG_COMPUTE_ENDPOINT, OG_COMPUTE_KEY, and OG_COMPUTE_MODEL
 GitHub repository: https://github.com/TS-mfon/0g-buildproof
 Live Vercel app:
 Render API health endpoint: https://zerog-buildproof-api.onrender.com/health
@@ -432,8 +425,8 @@ X post:
 ## Roadmap
 
 - Render Postgres persistence adapter.
-- Real 0G Storage SDK upload implementation with retrieved proof verification.
-- Full viem registry write integration.
+- Durable database persistence.
+- Retrieved 0G Storage proof verification.
 - Wallet-signed submission ownership.
 - Builder reputation pages.
 - Public BuildProof API for 0G ecosystem dashboards.

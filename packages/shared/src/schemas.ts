@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CLAIMABLE_MODULES } from "./constants.js";
 
-export const targetNetworkSchema = z.enum(["0g-mainnet", "0g-testnet"]);
+export const targetNetworkSchema = z.literal("0g-mainnet");
 export const claimableModuleSchema = z.enum(CLAIMABLE_MODULES);
 
 export const evmAddressSchema = z

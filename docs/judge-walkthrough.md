@@ -1,6 +1,6 @@
 # Judge Walkthrough
 
-Use `/judge/demo` for the initial walkthrough before real proof links are available.
+Use `/judge` to pick a real submitted project. Demo placeholder judge pages are intentionally disabled.
 
 Final Judge Mode must include:
 
@@ -15,4 +15,3 @@ Final Judge Mode must include:
 - Verified 0G modules
 - Critical issues
 - Final judge summary
-

@@ -10,4 +10,3 @@ via_ir = true
 
 [rpc_endpoints]
 0g_mainnet = "${OG_MAINNET_RPC_URL}"
-0g_testnet = "${OG_TESTNET_RPC_URL}"

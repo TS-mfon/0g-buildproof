@@ -9,13 +9,13 @@
 
 ## Order
 
-1. Deploy `BuildProofRegistry` to 0G testnet.
+1. Deploy `BuildProofRegistry` to 0G mainnet.
 2. Deploy `BuildProofRegistry` to 0G mainnet.
 3. Add registry addresses to Render and Vercel env vars.
 4. Deploy Render API.
 5. Deploy Render worker.
 6. Deploy Vercel frontend.
-7. Submit a demo project and capture proof links.
+7. Submit a real project and capture proof links.
 
 ## Render API
 

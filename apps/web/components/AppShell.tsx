@@ -10,7 +10,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link href="/submit">Submit</Link>
           <Link href="/projects">Leaderboard</Link>
           <Link href="/agents">Agents</Link>
-          <Link href="/judge/demo">Judge Mode</Link>
+          <Link href={"/judge" as never}>Judge Mode</Link>
         </nav>
       </header>
       <main className="main">{children}</main>
