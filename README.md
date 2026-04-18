@@ -255,6 +255,7 @@ Private backend values:
 ```env
 DATABASE_URL=
 REDIS_URL=
+ANALYSIS_QUEUE_MODE=sync
 GITHUB_TOKEN=
 PRIVATE_KEY=
 OG_MAINNET_RPC_URL=https://evmrpc.0g.ai
@@ -346,6 +347,7 @@ API_BASE_URL=https://0g-buildproof-api.onrender.com
 CORS_ORIGIN=https://0g-buildproof.vercel.app
 DATABASE_URL=
 REDIS_URL=
+ANALYSIS_QUEUE_MODE=sync
 GITHUB_TOKEN=
 PRIVATE_KEY=
 OG_COMPUTE_ENDPOINT=

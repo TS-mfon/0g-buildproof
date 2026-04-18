@@ -19,6 +19,8 @@ services:
         sync: false
       - key: REDIS_URL
         sync: false
+      - key: ANALYSIS_QUEUE_MODE
+        value: sync
       - key: GITHUB_TOKEN
         sync: false
       - key: PRIVATE_KEY

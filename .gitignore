@@ -15,3 +15,4 @@ contracts/broadcast
 *.log
 *.tsbuildinfo
 bun.lock
+.vercel

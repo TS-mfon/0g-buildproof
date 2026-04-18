@@ -5,6 +5,7 @@ import { runBuildProofAgents } from "../agents/orchestrator.js";
 import { enqueueAnalysis } from "../queue/producer.js";
 import { inspectGitHubRepo } from "../services/github.js";
 import { saveReport, updateJob } from "../db.js";
+import { env } from "../env.js";
 
 export async function projectRoutes(app: FastifyInstance): Promise<void> {
   app.post("/projects", async (request, reply) => {
@@ -31,6 +32,14 @@ export async function projectRoutes(app: FastifyInstance): Promise<void> {
     if (!project) return reply.code(404).send({ error: "Project not found" });
     const job = createJob(projectId);
     updateProjectStatus(projectId, "analyzing");
+    if (env.ANALYSIS_QUEUE_MODE !== "async") {
+      const report = await runAnalysis(projectId, job.id);
+      return reply.code(202).send({
+        job,
+        report,
+        mode: "synchronous"
+      });
+    }
     try {
       await enqueueAnalysis({ projectId, jobId: job.id });
     } catch (error) {
