@@ -8,6 +8,7 @@ export type GitHubInspection = {
   testsDetected: boolean;
   contractsDetected: boolean;
   files: string[];
+  readmeText?: string;
   warnings: string[];
 };
 
@@ -38,20 +39,35 @@ export async function inspectGitHubRepo(githubUrl: string): Promise<GitHubInspec
     const treeJson = await treeResponse.json() as { tree?: Array<{ path: string; type: string }> };
     const files = (treeJson.tree ?? []).filter((item) => item.type === "blob").map((item) => item.path);
     const lower = files.map((file) => file.toLowerCase());
+    const readmePath = files.find((file) => file.toLowerCase() === "readme.md" || file.toLowerCase().startsWith("readme."));
+    const readmeText = readmePath ? await fetchTextFile(owner, repo, branch, readmePath, headers) : undefined;
 
     return {
       defaultBranch: branch,
       commitCount: undefined,
-      readmeFound: lower.some((file) => file === "readme.md" || file.startsWith("readme.")),
+      readmeFound: Boolean(readmePath),
       packageManager: detectPackageManager(lower),
       testsDetected: lower.some((file) => file.includes("test") || file.includes("spec")),
       contractsDetected: lower.some((file) => file.endsWith(".sol") || file.includes("contracts/")),
       files: files.slice(0, 300),
+      readmeText,
       warnings: []
     };
   } catch (error) {
     return emptyInspection([error instanceof Error ? error.message : "GitHub inspection failed."]);
   }
+}
+
+async function fetchTextFile(
+  owner: string,
+  repo: string,
+  branch: string,
+  path: string,
+  headers: Record<string, string>
+): Promise<string | undefined> {
+  const response = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`, { headers });
+  if (!response.ok) return undefined;
+  return response.text();
 }
 
 function detectPackageManager(files: string[]): string | undefined {

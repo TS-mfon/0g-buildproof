@@ -7,12 +7,13 @@ import { anchorReportOn0G } from "../services/chain0g.js";
 import { runComputePrompt } from "../services/compute0g.js";
 
 export async function runBuildProofAgents(projectId: string, submission: ProjectSubmission, repo: GitHubInspection): Promise<BuildProofReport> {
+  const moduleEvidence = detectModuleEvidence(submission, repo);
   const compute = await runComputePrompt(
     "You are a 0G hackathon review agent. Return concise evidence-backed product guidance.",
     `Review ${submission.projectName}. Description: ${submission.description}. Claimed modules: ${submission.claimedModules.join(", ")}. GitHub: ${submission.githubUrl}.`
   );
   const findings: Record<string, AgentFinding> = {
-    IntegrationVerifier: integrationFinding(submission),
+    IntegrationVerifier: integrationFinding(submission, moduleEvidence),
     RepoAuditor: repoFinding(repo),
     DocsReviewer: docsFinding(repo),
     DemoReviewer: demoFinding(submission),
@@ -20,7 +21,7 @@ export async function runBuildProofAgents(projectId: string, submission: Project
     CommunityMentor: communityFinding(submission, compute.provider === "0g-compute" ? compute.text : undefined)
   };
   const rawScores = deriveScores(findings);
-  const hasValid0GProof = submission.explorerUrl.includes("0g") || submission.explorerUrl.includes("chainscan");
+  const hasValid0GProof = moduleEvidence.chain;
   const flags = {
     hasValid0GProof,
     hasStorageUpload: false,
@@ -45,7 +46,13 @@ export async function runBuildProofAgents(projectId: string, submission: Project
     explorerUrl: submission.explorerUrl,
     targetNetwork: submission.targetNetwork,
     claimedModules: submission.claimedModules,
-    verifiedModules: flags.hasComputeReview ? ["0G Compute"] : [],
+    verifiedModules: [
+      ...(moduleEvidence.chain ? ["0G Chain"] : []),
+      ...(moduleEvidence.storage ? ["0G Storage"] : []),
+      ...(moduleEvidence.agentId ? ["Agent ID"] : []),
+      ...(moduleEvidence.privacy ? ["Privacy"] : []),
+      ...(flags.hasComputeReview || moduleEvidence.compute ? ["0G Compute"] : [])
+    ],
     scores: rawScores,
     capsApplied: [],
     badges: [],
@@ -77,7 +84,7 @@ export async function runBuildProofAgents(projectId: string, submission: Project
   draft.evidence.storageTxHash = storage.txHash;
   flags.hasStorageUpload = storage.mode === "0g-storage" && Boolean(storage.root);
   if (flags.hasStorageUpload) {
-    draft.verifiedModules.push("0G Storage");
+    if (!draft.verifiedModules.includes("0G Storage")) draft.verifiedModules.push("0G Storage");
   } else {
     draft.warnings.push(`0G Storage upload was not verified: ${storage.error ?? storage.mode}`);
   }
@@ -98,7 +105,9 @@ export async function runBuildProofAgents(projectId: string, submission: Project
     draft.evidence.registryTxHash = chain.txHash;
     flags.hasChainAnchor = chain.mode === "0g-chain" && Boolean(chain.txHash);
     if (flags.hasChainAnchor) {
-      draft.verifiedModules.push("0G Chain");
+      if (!draft.verifiedModules.includes("0G Chain")) draft.verifiedModules.push("0G Chain");
+      draft.evidence.passportTokenId = chain.passportTokenId;
+      draft.evidence.passportMintTxHash = chain.txHash;
     } else {
       draft.warnings.push(`0G Chain registry anchor was not verified: ${chain.error ?? chain.mode}`);
     }
@@ -109,23 +118,78 @@ export async function runBuildProofAgents(projectId: string, submission: Project
   const capped = applyScoreCaps(rawScores.overall, flags);
   draft.scores = { ...rawScores, overall: capped.score };
   draft.capsApplied = capped.caps;
+  draft.verifiedModules = [...new Set(draft.verifiedModules)];
   draft.judgeSummary = `${submission.projectName} is ${capped.score >= 80 ? "judge-ready" : "promising but needs follow-up"} based on the current BuildProof evidence bundle.`;
   draft.badges = deriveBadges(draft);
   return draft;
 }
 
-function integrationFinding(submission: ProjectSubmission): AgentFinding {
-  const validExplorer = submission.explorerUrl.includes("0g") || submission.explorerUrl.includes("chainscan");
+type ModuleEvidence = {
+  chain: boolean;
+  storage: boolean;
+  compute: boolean;
+  agentId: boolean;
+  privacy: boolean;
+  reasons: string[];
+  missing: string[];
+};
+
+function integrationFinding(submission: ProjectSubmission, evidence: ModuleEvidence): AgentFinding {
+  const verifiedClaimCount = submission.claimedModules.filter((module) => {
+    if (module === "0G Chain") return evidence.chain;
+    if (module === "0G Storage") return evidence.storage;
+    if (module === "0G Compute") return evidence.compute;
+    if (module === "Agent ID") return evidence.agentId;
+    if (module === "Privacy") return evidence.privacy;
+    return false;
+  }).length;
+  const score = Math.min(95, 30 + verifiedClaimCount * 14 + (evidence.chain ? 15 : 0) + (evidence.storage ? 10 : 0));
   return {
     agentName: "IntegrationVerifier",
-    score: validExplorer ? 84 : 42,
-    summary: validExplorer ? "0G proof fields are present and point to a 0G-style explorer." : "Explorer proof is weak or missing.",
-    evidence: [submission.submittedContract, submission.explorerUrl],
-    warnings: validExplorer ? [] : ["Explorer URL does not look like a 0G explorer URL."],
-    criticalIssues: validExplorer ? [] : ["0G integration cannot be verified from submitted proof."],
-    recommendedFixes: validExplorer ? ["Add the final registry transaction after deployment."] : ["Submit a valid 0G Chain Explorer link."],
-    confidence: "medium"
+    score,
+    summary: `${verifiedClaimCount}/${submission.claimedModules.length} claimed 0G modules have evidence in the submitted proof bundle.`,
+    evidence: [submission.submittedContract, submission.explorerUrl, ...evidence.reasons],
+    warnings: evidence.missing,
+    criticalIssues: evidence.chain ? [] : ["0G Chain proof could not be verified from the submitted contract and Explorer URL."],
+    recommendedFixes: [
+      "Include final 0G Chain Explorer links in the README.",
+      "Document each claimed 0G component with code paths, env vars, and proof links.",
+      "Add a demo section showing the 0G component in the product flow."
+    ],
+    confidence: evidence.reasons.length >= 2 ? "high" : "medium"
   };
+}
+
+export function detectModuleEvidence(submission: ProjectSubmission, repo: GitHubInspection): ModuleEvidence {
+  const haystack = [
+    submission.description,
+    submission.explorerUrl,
+    submission.githubUrl,
+    submission.demoUrl,
+    ...(repo.files ?? []),
+    repo.readmeText ?? ""
+  ].join("\n").toLowerCase();
+  const explorer = submission.explorerUrl.toLowerCase();
+  const reasons: string[] = [];
+  const chain = /^0x[a-f0-9]{40}$/.test(submission.submittedContract.toLowerCase()) && (explorer.includes("chainscan.0g.ai") || explorer.includes("0g.ai"));
+  const storage = /0g[-_\s]?storage|indexer-storage|0g-ts-sdk|storage root|storagescan|root hash/.test(haystack);
+  const compute = /0g[-_\s]?compute|serving broker|sealed inference|inference endpoint|compute provider|og_compute/.test(haystack);
+  const agentId = /agent id|agentid|agent identity|\.0g|agent profile/.test(haystack);
+  const privacy = /tee|sealed inference|privacy|encrypted|confidential|secure execution/.test(haystack);
+  if (chain) reasons.push("Submitted contract and Explorer URL point to 0G Chain.");
+  if (storage) reasons.push("Repository or README contains 0G Storage evidence.");
+  if (compute) reasons.push("Repository or README contains 0G Compute evidence.");
+  if (agentId) reasons.push("Repository or README contains Agent ID evidence.");
+  if (privacy) reasons.push("Repository or README contains privacy or secure execution evidence.");
+  const missing = submission.claimedModules.flatMap((module) => {
+    if (module === "0G Chain" && !chain) return ["Claimed 0G Chain, but submitted contract or Explorer proof is weak."];
+    if (module === "0G Storage" && !storage) return ["Claimed 0G Storage, but README or repo evidence was not found."];
+    if (module === "0G Compute" && !compute) return ["Claimed 0G Compute, but compute code or docs evidence was not found."];
+    if (module === "Agent ID" && !agentId) return ["Claimed Agent ID, but identity evidence was not found."];
+    if (module === "Privacy" && !privacy) return ["Claimed Privacy, but privacy or secure execution evidence was not found."];
+    return [];
+  });
+  return { chain, storage, compute, agentId, privacy, reasons, missing };
 }
 
 function repoFinding(repo: GitHubInspection): AgentFinding {

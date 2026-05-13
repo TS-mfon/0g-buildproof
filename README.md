@@ -72,7 +72,7 @@ Browser
   -> optional 0G Compute endpoint when configured
 ```
 
-The current implementation uses the Render API process as the source of truth for submitted projects and reports. `DATABASE_URL` and `REDIS_URL` are reserved for production persistence and background job orchestration.
+The Render API persists submitted projects, jobs, and reports to `DATA_DIR/buildproof-state.json`. On Render this should be backed by the mounted disk at `/var/data`. Reports are also uploaded to 0G Storage when the SDK returns a real root hash, and the passport can be minted through the 0G registry.
 
 ## Monorepo Structure
 
@@ -97,9 +97,14 @@ Core functions:
 - `setStatus`
 - `endorseProject`
 - `flagProject`
+- `ownerOf`
+- `balanceOf`
+- `tokenURI`
 - `getProject`
 - `getProjectCount`
 - `getProjectsByOwner`
+
+`registerProject` also mints a non-transferable passport token. The token ID equals the registry project ID and `tokenURI(tokenId)` returns the 0G Storage root for the passport report.
 
 Compile settings:
 
@@ -122,6 +127,7 @@ POST /projects/:projectId/analyze
 GET  /projects/:projectId/jobs/:jobId
 GET  /projects/:projectId/report
 GET  /projects/:projectId/judge
+POST /projects/:projectId/mint
 GET  /storage/:projectId
 POST /internal/jobs/:jobId/run
 ```
@@ -151,7 +157,7 @@ publish-passport
 
 Every agent produces evidence-bound JSON. No finding should appear without a linked source, submitted field, GitHub path, Explorer URL, or storage proof.
 
-- **IntegrationVerifier:** checks contract address, Explorer link, claimed modules, and proof consistency.
+- **IntegrationVerifier:** checks contract address, Explorer link, claimed modules, README/code evidence, and proof consistency. Claimed modules only count when matching evidence is found.
 - **RepoAuditor:** checks implementation depth, source files, tests, and placeholder risk.
 - **DocsReviewer:** checks README, architecture notes, setup, and reproducibility.
 - **DemoReviewer:** checks demo presence and whether final video can show real 0G usage.
@@ -197,6 +203,16 @@ Judge Ready
 Community Useful
 Needs Work
 High Risk
+```
+
+Module verification:
+
+```text
+0G Chain: submitted contract plus 0G/ChainScan Explorer evidence
+0G Storage: README/repo evidence plus successful 0G Storage root when available
+0G Compute: README/repo evidence plus configured Compute review when available
+Agent ID: README/repo evidence for agent identity or .0g identity
+Privacy: README/repo evidence for TEE, sealed inference, encryption, or secure execution
 ```
 
 ## Local Development
@@ -246,7 +262,7 @@ NEXT_PUBLIC_API_BASE_URL=
 NEXT_PUBLIC_0G_MAINNET_CHAIN_ID=16661
 NEXT_PUBLIC_0G_MAINNET_RPC_URL=https://evmrpc.0g.ai
 NEXT_PUBLIC_0G_MAINNET_EXPLORER=https://chainscan.0g.ai
-NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=
+NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
 ```
 
@@ -254,6 +270,7 @@ Private backend values:
 
 ```env
 DATABASE_URL=
+DATA_DIR=/var/data
 REDIS_URL=
 ANALYSIS_QUEUE_MODE=sync
 GITHUB_TOKEN=
@@ -263,7 +280,7 @@ OG_MAINNET_STORAGE_INDEXER=https://indexer-storage-turbo.0g.ai
 OG_COMPUTE_ENDPOINT=
 OG_COMPUTE_KEY=
 OG_COMPUTE_MODEL=
-BUILDPROOF_REGISTRY_MAINNET=
+BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
 ```
 
 ## Data Needed Before Final Deployment
@@ -309,8 +326,15 @@ forge create \
 After deployment, update:
 
 ```env
-BUILDPROOF_REGISTRY_MAINNET=
-NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=
+BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
+NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
+```
+
+Current deployed passport registry:
+
+```text
+BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
+Deployment transaction: https://chainscan.0g.ai/tx/0x0e685a0b54fd00fb64bd8698cf0b1b5c99a16dea495fcf7fdce1399026c2ef73
 ```
 
 ## Render Deployment
@@ -353,7 +377,7 @@ PRIVATE_KEY=
 OG_COMPUTE_ENDPOINT=
 OG_COMPUTE_KEY=
 OG_COMPUTE_MODEL=
-BUILDPROOF_REGISTRY_MAINNET=
+BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
 ```
 
 ## Vercel Deployment
@@ -367,7 +391,7 @@ apps/web
 Build command:
 
 ```bash
-npm run build --workspace @buildproof/web
+npm run build --workspace @buildproof/shared && npm run build --workspace @buildproof/web
 ```
 
 Required Vercel env vars:
@@ -377,7 +401,7 @@ NEXT_PUBLIC_API_BASE_URL=https://0g-buildproof-api.onrender.com
 NEXT_PUBLIC_0G_MAINNET_CHAIN_ID=16661
 NEXT_PUBLIC_0G_MAINNET_RPC_URL=https://evmrpc.0g.ai
 NEXT_PUBLIC_0G_MAINNET_EXPLORER=https://chainscan.0g.ai
-NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=
+NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
 ```
 
@@ -402,10 +426,11 @@ Target length: under three minutes.
 Fill these before HackQuest submission:
 
 ```text
-0G mainnet registry contract: 0x45119A32ca6C4d67424401dA92Abe4EC6c83f8Ce
-0G mainnet Explorer link: https://chainscan.0g.ai/tx/0x35af72b28f166b455781f8fdaa06eb764c5d231fc5c0b165c16db4913be734dd
-0G registry project activity: https://chainscan.0g.ai/tx/0x55911abae2e242a0b207f915b5e44d22619ec242745923153be1645816674dbe
+0G mainnet registry contract: 0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
+0G mainnet Explorer link: https://chainscan.0g.ai/tx/0x0e685a0b54fd00fb64bd8698cf0b1b5c99a16dea495fcf7fdce1399026c2ef73
+0G registry project activity: generated per analyzed project during registry anchoring
 0G Storage root: generated per submitted project after analysis
+Passport mint tx: generated by POST /projects/:projectId/mint or during registry anchoring
 0G Compute model/provider: requires OG_COMPUTE_ENDPOINT, OG_COMPUTE_KEY, and OG_COMPUTE_MODEL
 GitHub repository: https://github.com/TS-mfon/0g-buildproof
 Live Vercel app:

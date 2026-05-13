@@ -1,16 +1,18 @@
 import { env } from "../env.js";
-import { Contract, JsonRpcProvider, Wallet } from "ethers";
+import { Contract, Interface, JsonRpcProvider, Wallet } from "ethers";
 import type { ScoreSet } from "@buildproof/shared";
 
 export type ChainAnchor = {
   registryAddress?: string;
   txHash?: string;
+  passportTokenId?: string;
   mode: "0g-chain" | "not-configured" | "failed";
   error?: string;
 };
 
 const registryAbi = [
-  "function registerProject(string name,string githubUrl,string demoUrl,address submittedContract,string explorerUrl,string storageRoot,bytes32 reportHash,(uint16 overall,uint16 integration,uint16 implementationScore,uint16 documentation,uint16 demo,uint16 community,uint16 security) scores) external returns (uint256 projectId)"
+  "function registerProject(string name,string githubUrl,string demoUrl,address submittedContract,string explorerUrl,string storageRoot,bytes32 reportHash,(uint16 overall,uint16 integration,uint16 implementationScore,uint16 documentation,uint16 demo,uint16 community,uint16 security) scores) external returns (uint256 projectId)",
+  "event PassportMinted(uint256 indexed projectId,uint256 indexed tokenId,address indexed owner,string tokenUri)"
 ];
 
 export async function anchorReportOn0G(params: {
@@ -52,7 +54,12 @@ export async function anchorReportOn0G(params: {
       ]
     );
     const receipt = await tx.wait();
-    return { registryAddress, txHash: receipt?.hash ?? tx.hash, mode: "0g-chain" };
+    return {
+      registryAddress,
+      txHash: receipt?.hash ?? tx.hash,
+      passportTokenId: extractPassportTokenId(receipt?.logs ?? []),
+      mode: "0g-chain"
+    };
   } catch (error) {
     return {
       registryAddress,
@@ -60,4 +67,17 @@ export async function anchorReportOn0G(params: {
       error: error instanceof Error ? error.message : String(error)
     };
   }
+}
+
+function extractPassportTokenId(logs: Array<{ topics: readonly string[]; data: string }>): string | undefined {
+  const iface = new Interface(registryAbi);
+  for (const log of logs) {
+    try {
+      const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
+      if (parsed?.name === "PassportMinted") return parsed.args.tokenId.toString();
+    } catch {
+      // Ignore unrelated logs.
+    }
+  }
+  return undefined;
 }

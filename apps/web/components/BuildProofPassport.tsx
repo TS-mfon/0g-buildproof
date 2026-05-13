@@ -1,5 +1,6 @@
 import type { BuildProofReport } from "@buildproof/shared";
 import { ScoreBreakdown } from "./ScoreBreakdown";
+import { MintPassportButton } from "./MintPassportButton";
 
 export function BuildProofPassport({ report }: { report: BuildProofReport }) {
   return (
@@ -21,8 +22,10 @@ export function BuildProofPassport({ report }: { report: BuildProofReport }) {
           <div className="proof-step"><strong>GitHub evidence</strong><a href={report.githubUrl}>{report.githubUrl}</a></div>
           <div className="proof-step"><strong>0G Storage</strong><span>{report.evidence.storageRoot || "pending"}</span></div>
           <div className="proof-step"><strong>Report hash</strong><span>{report.evidence.reportHash || "pending"}</span></div>
-          <div className="proof-step"><strong>0G Chain</strong><span>{report.evidence.registryTxHash || "pending deployment"}</span></div>
+          <div className="proof-step"><strong>0G Chain</strong><span>{report.evidence.registryTxHash || "pending mint"}</span></div>
+          <div className="proof-step"><strong>Passport token</strong><span>{report.evidence.passportTokenId || "pending mint"}</span></div>
         </div>
+        <MintPassportButton projectId={report.projectId} minted={Boolean(report.evidence.passportMintTxHash)} />
       </section>
 
       <section className="band">

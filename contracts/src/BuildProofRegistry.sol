@@ -45,9 +45,14 @@ contract BuildProofRegistry {
     mapping(address => uint256[]) private projectsByOwner;
     mapping(uint256 => mapping(address => bool)) public hasEndorsed;
     mapping(uint256 => mapping(address => bool)) public hasFlagged;
+    mapping(uint256 => address) private tokenOwners;
+    mapping(address => uint256) private tokenBalances;
+    mapping(uint256 => string) private tokenUris;
 
     event ProjectRegistered(uint256 indexed projectId, address indexed owner, bytes32 indexed reportHash);
     event ProjectReportUpdated(uint256 indexed projectId, bytes32 indexed reportHash, string storageRoot);
+    event PassportMinted(uint256 indexed projectId, uint256 indexed tokenId, address indexed owner, string tokenUri);
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event ProjectStatusChanged(uint256 indexed projectId, ProjectStatus status);
     event ProjectEndorsed(uint256 indexed projectId, address indexed endorser);
     event ProjectFlagged(uint256 indexed projectId, address indexed reporter, string reason);
@@ -110,7 +115,12 @@ contract BuildProofRegistry {
             flags: 0
         });
         projectsByOwner[msg.sender].push(projectId);
+        tokenOwners[projectId] = msg.sender;
+        tokenBalances[msg.sender] += 1;
+        tokenUris[projectId] = storageRoot;
         emit ProjectRegistered(projectId, msg.sender, reportHash);
+        emit Transfer(address(0), msg.sender, projectId);
+        emit PassportMinted(projectId, projectId, msg.sender, storageRoot);
     }
 
     function updateReport(
@@ -129,6 +139,7 @@ contract BuildProofRegistry {
         project.reportHash = reportHash;
         project.scores = scores;
         project.updatedAt = uint64(block.timestamp);
+        tokenUris[projectId] = storageRoot;
         emit ProjectReportUpdated(projectId, reportHash, storageRoot);
     }
 
@@ -175,6 +186,22 @@ contract BuildProofRegistry {
 
     function getProjectsByOwner(address projectOwner) external view returns (uint256[] memory) {
         return projectsByOwner[projectOwner];
+    }
+
+    function ownerOf(uint256 tokenId) external view returns (address) {
+        address tokenOwner = tokenOwners[tokenId];
+        if (tokenOwner == address(0)) revert ProjectNotFound();
+        return tokenOwner;
+    }
+
+    function balanceOf(address tokenOwner) external view returns (uint256) {
+        if (tokenOwner == address(0)) revert EmptyRequiredField();
+        return tokenBalances[tokenOwner];
+    }
+
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
+        if (tokenOwners[tokenId] == address(0)) revert ProjectNotFound();
+        return tokenUris[tokenId];
     }
 
     function _project(uint256 projectId) private view returns (Project storage project) {

@@ -30,3 +30,9 @@ export async function startAnalysis(projectId: string): Promise<{ job: { id: str
   if (!response.ok) throw new Error(await response.text());
   return response.json();
 }
+
+export async function mintPassport(projectId: string): Promise<{ report: BuildProofReport; minted: boolean }> {
+  const response = await fetch(`${API_BASE_URL}/projects/${projectId}/mint`, { method: "POST" });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json();
+}

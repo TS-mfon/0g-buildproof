@@ -6,6 +6,10 @@ services:
     plan: starter
     healthCheckPath: /health
     autoDeploy: false
+    disk:
+      name: buildproof-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
@@ -17,6 +21,8 @@ services:
         sync: false
       - key: DATABASE_URL
         sync: false
+      - key: DATA_DIR
+        value: /var/data
       - key: REDIS_URL
         sync: false
       - key: ANALYSIS_QUEUE_MODE
@@ -32,7 +38,7 @@ services:
       - key: OG_COMPUTE_MODEL
         sync: false
       - key: BUILDPROOF_REGISTRY_MAINNET
-        sync: false
+        value: 0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
 
   - type: worker
     name: 0g-buildproof-worker

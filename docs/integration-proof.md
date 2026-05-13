@@ -3,11 +3,13 @@
 Final submission must include:
 
 ```text
-0G mainnet registry contract: 0x45119A32ca6C4d67424401dA92Abe4EC6c83f8Ce
-0G Explorer deployment transaction: https://chainscan.0g.ai/tx/0x35af72b28f166b455781f8fdaa06eb764c5d231fc5c0b165c16db4913be734dd
-0G registry project activity: https://chainscan.0g.ai/tx/0x55911abae2e242a0b207f915b5e44d22619ec242745923153be1645816674dbe
+0G mainnet registry contract: 0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
+0G Explorer deployment transaction: https://chainscan.0g.ai/tx/0x0e685a0b54fd00fb64bd8698cf0b1b5c99a16dea495fcf7fdce1399026c2ef73
+0G registry project activity: generated per analyzed project during registry anchoring
 0G Explorer project registration transaction:
 0G Storage root:
+Passport token ID:
+Passport mint transaction:
 0G Compute provider/model:
 Live passport URL:
 Live Judge Mode URL:

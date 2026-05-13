@@ -68,6 +68,8 @@ export const buildProofReportSchema = z.object({
     storageTxHash: z.string().optional(),
     registryTxHash: z.string().optional(),
     registryAddress: z.string().optional(),
+    passportTokenId: z.string().optional(),
+    passportMintTxHash: z.string().optional(),
     reportHash: z.string(),
     repoDefaultBranch: z.string().optional(),
     commitCount: z.number().int().nonnegative().optional(),

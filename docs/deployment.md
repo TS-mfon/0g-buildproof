@@ -10,12 +10,12 @@
 ## Order
 
 1. Deploy `BuildProofRegistry` to 0G mainnet.
-2. Deploy `BuildProofRegistry` to 0G mainnet.
-3. Add registry addresses to Render and Vercel env vars.
+2. Add registry addresses to Render and Vercel env vars.
+3. Mount a persistent Render disk at `/var/data`.
 4. Deploy Render API.
 5. Deploy Render worker.
 6. Deploy Vercel frontend.
-7. Submit a real project and capture proof links.
+7. Submit a real project, run analysis, mint the passport, and capture proof links.
 
 ## Render API
 
@@ -29,6 +29,12 @@ Health check:
 
 ```text
 /health
+```
+
+Persistent data path:
+
+```text
+DATA_DIR=/var/data
 ```
 
 ## Render Worker
@@ -52,5 +58,5 @@ apps/web
 Build command:
 
 ```bash
-npm run build --workspace @buildproof/web
+npm run build --workspace @buildproof/shared && npm run build --workspace @buildproof/web
 ```

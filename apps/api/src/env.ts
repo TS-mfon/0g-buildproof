@@ -5,6 +5,7 @@ const envSchema = z.object({
   NODE_ENV: z.string().default("development"),
   PORT: z.coerce.number().default(4000),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  DATA_DIR: z.string().default(".data"),
   DATABASE_URL: z.string().optional(),
   REDIS_URL: z.string().optional(),
   ANALYSIS_QUEUE_MODE: z.enum(["sync", "async"]).default("sync"),

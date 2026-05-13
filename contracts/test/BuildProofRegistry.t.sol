@@ -20,6 +20,9 @@ contract BuildProofRegistryTest is Test {
         assertEq(project.owner, builder);
         assertEq(project.scores.overall, 90);
         assertEq(registry.getProjectCount(), 1);
+        assertEq(registry.ownerOf(projectId), builder);
+        assertEq(registry.balanceOf(builder), 1);
+        assertEq(_hashText(registry.tokenURI(projectId)), _hashText("0xroot"));
     }
 
     function testOnlyProjectOwnerCanUpdateReport() public {
@@ -33,6 +36,7 @@ contract BuildProofRegistryTest is Test {
         vm.prank(builder);
         registry.updateReport(projectId, "0xnewroot", keccak256("new-report"), scores);
         assertEq(registry.getProject(projectId).scores.overall, 91);
+        assertEq(_hashText(registry.tokenURI(projectId)), _hashText("0xnewroot"));
     }
 
     function testOwnerCanSetStatus() public {
@@ -110,5 +114,9 @@ contract BuildProofRegistryTest is Test {
             community: 91,
             security: 89
         });
+    }
+
+    function _hashText(string memory value) private pure returns (uint256) {
+        return uint256(keccak256(bytes(value)));
     }
 }

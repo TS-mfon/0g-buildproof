@@ -6,6 +6,7 @@ import { enqueueAnalysis } from "../queue/producer.js";
 import { inspectGitHubRepo } from "../services/github.js";
 import { saveReport, updateJob } from "../db.js";
 import { env } from "../env.js";
+import { anchorReportOn0G } from "../services/chain0g.js";
 
 export async function projectRoutes(app: FastifyInstance): Promise<void> {
   app.post("/projects", async (request, reply) => {
@@ -84,6 +85,46 @@ export async function projectRoutes(app: FastifyInstance): Promise<void> {
     const report = getReport(projectId);
     if (!report) return reply.code(404).send({ error: "Report not found" });
     return { report };
+  });
+
+  app.post("/projects/:projectId/mint", async (request, reply) => {
+    const { projectId } = request.params as { projectId: string };
+    const project = getProject(projectId);
+    const report = getReport(projectId);
+    if (!project || !report) return reply.code(404).send({ error: "Passport report not ready" });
+    if (!report.evidence.storageRoot) {
+      return reply.code(409).send({ error: "Passport must be stored on 0G Storage before minting." });
+    }
+    if (report.evidence.passportMintTxHash) return { report, minted: true };
+
+    const chain = await anchorReportOn0G({
+      projectName: report.projectName,
+      githubUrl: report.githubUrl,
+      demoUrl: report.demoUrl,
+      submittedContract: report.submittedContract,
+      explorerUrl: report.explorerUrl,
+      reportHash: report.evidence.reportHash,
+      storageRoot: report.evidence.storageRoot,
+      scores: report.scores
+    });
+    if (chain.mode !== "0g-chain" || !chain.txHash) {
+      return reply.code(502).send({ error: chain.error ?? "0G Chain mint failed", mode: chain.mode });
+    }
+
+    const updated = {
+      ...report,
+      evidence: {
+        ...report.evidence,
+        registryAddress: chain.registryAddress,
+        registryTxHash: chain.txHash,
+        passportMintTxHash: chain.txHash,
+        passportTokenId: chain.passportTokenId
+      },
+      verifiedModules: [...new Set([...report.verifiedModules, "0G Chain"])],
+      badges: [...new Set([...report.badges, "Chain Anchored", "Mainnet Proof"])]
+    };
+    saveReport(project.id, updated);
+    return { report: updated, minted: true };
   });
 
   app.get("/projects/:projectId/judge", async (request, reply) => {
