@@ -2,7 +2,6 @@
 
 0G BuildProof is a verifiable quality and reputation layer for 0G ecosystem projects. Builders submit a repository, demo, 0G mainnet contract address, and Explorer proof. AI agents review the submission, generate a BuildProof Passport, upload the report bundle to 0G Storage, and anchor the report hash through a 0G mainnet registry.
 
-## One-Sentence Description
 
 0G BuildProof verifies project integrations, scores technical quality, and stores builder reputation using AI agents, 0G Storage, 0G Compute, and 0G Chain.
 
@@ -164,56 +163,7 @@ Every agent produces evidence-bound JSON. No finding should appear without a lin
 - **SecurityReviewer:** checks obvious secret hygiene and deployment risks.
 - **CommunityMentor:** creates improvement tasks and ecosystem contribution ideas. When 0G Compute is configured, this review is backed by the Compute endpoint.
 
-## Scoring Rubric
 
-Weights:
-
-```text
-0G integration depth: 35
-technical completeness: 20
-documentation/reproducibility: 20
-demo clarity: 10
-community usefulness: 10
-security/reliability hygiene: 5
-```
-
-Caps:
-
-```text
-No valid 0G contract or Explorer proof: max 45
-No 0G Storage upload: max 55
-No 0G Compute review: max 75
-Empty or placeholder repo: max 35
-Missing README: max 60
-Missing demo: max 70
-Broken setup instructions: max 80
-Detected secret leak: max 50
-No on-chain anchor: max 65
-```
-
-Badges:
-
-```text
-Storage Verified
-Chain Anchored
-Compute Reviewed
-Mainnet Proof
-Docs Excellent
-Judge Ready
-Community Useful
-Needs Work
-High Risk
-```
-
-Module verification:
-
-```text
-0G Chain: submitted contract plus 0G/ChainScan Explorer evidence
-0G Storage: README/repo evidence plus successful 0G Storage root when available
-0G Compute: README/repo evidence plus configured Compute review when available
-Agent ID: README/repo evidence for agent identity or .0g identity
-Privacy: README/repo evidence for TEE, sealed inference, encryption, or secure execution
-```
 
 ## Local Development
 
@@ -283,29 +233,6 @@ OG_COMPUTE_MODEL=
 BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
 ```
 
-## Data Needed Before Final Deployment
-
-Do not paste private keys into normal chat. Use `.env.local`, Render env vars, Vercel env vars, or a secure terminal prompt.
-
-Non-secret data:
-
-- Final GitHub repository URL
-- Team name
-- Primary builder wallet public address
-- Target X handle for the public post
-- Vercel project name
-- Render service names
-- Final domain preference
-
-Secrets:
-
-- Fresh 0G deployer private key with limited funds
-- 0G Storage signer key if separate from deployer
-- GitHub token if API rate limits matter
-- 0G Compute endpoint/key/model
-- WalletConnect/Reown project ID if wallet modal is enabled
-- Render API key if deploying by CLI
-- Vercel token if deploying by CLI
 
 ## 0G Deployment
 
@@ -405,50 +332,6 @@ NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
 ```
 
-## Demo Script
-
-Target length: under three minutes.
-
-```text
-0:00-0:15 0G ecosystem needs verifiable builder quality.
-0:15-0:35 Submit repo, demo, 0G contract, Explorer link.
-0:35-1:05 Agent timeline runs.
-1:05-1:30 Passport appears with scores, badges, risks.
-1:30-1:55 Open 0G Storage proof.
-1:55-2:20 Open 0G Chain Explorer proof.
-2:20-2:40 Open Judge Mode.
-2:40-2:55 Show leaderboard.
-2:55-3:00 BuildProof makes 0G project quality verifiable.
-```
-
-## Hackathon Submission Proof
-
-Fill these before HackQuest submission:
-
-```text
-0G mainnet registry contract: 0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
-0G mainnet Explorer link: https://chainscan.0g.ai/tx/0x0e685a0b54fd00fb64bd8698cf0b1b5c99a16dea495fcf7fdce1399026c2ef73
-0G registry project activity: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
-0G Storage root: 0x756b13671ee2df65f79feb943f340978f32673159a91a856e7b6709a27252c86
-Passport token ID: 3
-Passport mint tx: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
-0G Compute model/provider: requires OG_COMPUTE_ENDPOINT, OG_COMPUTE_KEY, and OG_COMPUTE_MODEL
-GitHub repository: https://github.com/TS-mfon/0g-buildproof
-Live Vercel app:
-Render API health endpoint: https://zerog-buildproof-api-sytg.onrender.com/health
-Demo video:
-X post:
-```
-
-## Security Notes
-
-- Use a fresh deployer wallet with limited funds.
-- Never commit `.env`, `.env.local`, private keys, API keys, or seed phrases.
-- Store production secrets only in Render or Vercel dashboards.
-- Only expose `NEXT_PUBLIC_*` values to the frontend.
-- Prefer user wallet signing where possible.
-- Rotate any key that appears in a log, screenshot, repo, or demo recording.
-- `npm audit` currently reports transitive axios advisories through the 0G TypeScript SDK dependency chain. There is no npm audit fix available at the time of implementation; review the SDK release notes before final deployment.
 
 ## Roadmap
 
@@ -461,3 +344,6 @@ X post:
 - Grant readiness score.
 - OpenClaw-native orchestration.
 - Sealed private pre-review mode.
+
+
+I used render free tier so please be patient cause the service goes to sleep every 15 mins
