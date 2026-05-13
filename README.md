@@ -428,10 +428,10 @@ Fill these before HackQuest submission:
 ```text
 0G mainnet registry contract: 0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
 0G mainnet Explorer link: https://chainscan.0g.ai/tx/0x0e685a0b54fd00fb64bd8698cf0b1b5c99a16dea495fcf7fdce1399026c2ef73
-0G registry project activity: https://chainscan.0g.ai/tx/0xc59a4297da86808a1a736f8e61568fd082e00dee2cead89440f1403707a5fb49
-0G Storage root: 0xb304f03b236615b9b8a1d53e522c8f2b7465b1eb5f2447b34cf1d45dbffa8c59
-Passport token ID: 1
-Passport mint tx: https://chainscan.0g.ai/tx/0xc59a4297da86808a1a736f8e61568fd082e00dee2cead89440f1403707a5fb49
+0G registry project activity: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
+0G Storage root: 0x756b13671ee2df65f79feb943f340978f32673159a91a856e7b6709a27252c86
+Passport token ID: 3
+Passport mint tx: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
 0G Compute model/provider: requires OG_COMPUTE_ENDPOINT, OG_COMPUTE_KEY, and OG_COMPUTE_MODEL
 GitHub repository: https://github.com/TS-mfon/0g-buildproof
 Live Vercel app:

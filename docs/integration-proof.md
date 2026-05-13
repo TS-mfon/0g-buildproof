@@ -18,12 +18,12 @@ Live Judge Mode URL:
 Live smoke proof generated on May 13, 2026:
 
 ```text
-Project: BuildProof Self Audit
-0G Storage root: 0xb304f03b236615b9b8a1d53e522c8f2b7465b1eb5f2447b34cf1d45dbffa8c59
-0G Storage transaction: https://chainscan.0g.ai/tx/0x49665f8b41817ec0ddc76cd947d72c88539f8eed5abaa907ee10d40fb8a891eb
-0G registry transaction: https://chainscan.0g.ai/tx/0xc59a4297da86808a1a736f8e61568fd082e00dee2cead89440f1403707a5fb49
-Passport token ID: 1
-Passport mint transaction: https://chainscan.0g.ai/tx/0xc59a4297da86808a1a736f8e61568fd082e00dee2cead89440f1403707a5fb49
+Project: BuildProof Final Passport
+0G Storage root: 0x756b13671ee2df65f79feb943f340978f32673159a91a856e7b6709a27252c86
+0G Storage transaction: https://chainscan.0g.ai/tx/0x58760806c9917fa73219e6059bf230d59fbfd52df4d67c59b548940568980e9b
+0G registry transaction: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
+Passport token ID: 3
+Passport mint transaction: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
 ```
 
 ## Mainnet Defaults
