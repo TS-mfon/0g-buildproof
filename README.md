@@ -332,6 +332,50 @@ NEXT_PUBLIC_BUILDPROOF_REGISTRY_MAINNET=0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=
 ```
 
+## Demo Script
+
+Target length: under three minutes.
+
+```text
+0:00-0:15 0G ecosystem needs verifiable builder quality.
+0:15-0:35 Submit repo, demo, 0G contract, Explorer link.
+0:35-1:05 Agent timeline runs.
+1:05-1:30 Passport appears with scores, badges, risks.
+1:30-1:55 Open 0G Storage proof.
+1:55-2:20 Open 0G Chain Explorer proof.
+2:20-2:40 Open Judge Mode.
+2:40-2:55 Show leaderboard.
+2:55-3:00 BuildProof makes 0G project quality verifiable.
+```
+
+## Hackathon Submission Proof
+
+Fill these before HackQuest submission:
+
+```text
+0G mainnet registry contract: 0x6C7Bd982991Cb2dedfcCF48Ee08445b74E0e50A8
+0G mainnet Explorer link: https://chainscan.0g.ai/tx/0x0e685a0b54fd00fb64bd8698cf0b1b5c99a16dea495fcf7fdce1399026c2ef73
+0G registry project activity: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
+0G Storage root: 0x756b13671ee2df65f79feb943f340978f32673159a91a856e7b6709a27252c86
+Passport token ID: 3
+Passport mint tx: https://chainscan.0g.ai/tx/0x990280e641b9c4ecf88c6c8c4c07a9886ca0fd9f220873b3a588d2c7c0507c44
+0G Compute model/provider: requires OG_COMPUTE_ENDPOINT, OG_COMPUTE_KEY, and OG_COMPUTE_MODEL
+GitHub repository: https://github.com/TS-mfon/0g-buildproof
+Live Vercel app: https://0g-buildproof.vercel.app
+Render API health endpoint: https://zerog-buildproof-api-sytg.onrender.com/health
+Demo video:
+X post:
+```
+
+## Security Notes
+
+- Use a fresh deployer wallet with limited funds.
+- Never commit `.env`, `.env.local`, private keys, API keys, or seed phrases.
+- Store production secrets only in Render or Vercel dashboards.
+- Only expose `NEXT_PUBLIC_*` values to the frontend.
+- Prefer user wallet signing where possible.
+- Rotate any key that appears in a log, screenshot, repo, or demo recording.
+- `npm audit` currently reports transitive axios advisories through the 0G TypeScript SDK dependency chain. There is no npm audit fix available at the time of implementation; review the SDK release notes before final deployment.
 
 ## Roadmap
 
