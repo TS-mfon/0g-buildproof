@@ -15,6 +15,17 @@ Live passport URL:
 Live Judge Mode URL:
 ```
 
+Live smoke proof generated on May 13, 2026:
+
+```text
+Project: BuildProof Self Audit
+0G Storage root: 0xb304f03b236615b9b8a1d53e522c8f2b7465b1eb5f2447b34cf1d45dbffa8c59
+0G Storage transaction: https://chainscan.0g.ai/tx/0x49665f8b41817ec0ddc76cd947d72c88539f8eed5abaa907ee10d40fb8a891eb
+0G registry transaction: https://chainscan.0g.ai/tx/0xc59a4297da86808a1a736f8e61568fd082e00dee2cead89440f1403707a5fb49
+Passport token ID: 1
+Passport mint transaction: https://chainscan.0g.ai/tx/0xc59a4297da86808a1a736f8e61568fd082e00dee2cead89440f1403707a5fb49
+```
+
 ## Mainnet Defaults
 
 ```text

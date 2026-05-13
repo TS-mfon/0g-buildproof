@@ -27,7 +27,7 @@ The evaluator does not trust checked boxes alone. It verifies claimed modules wi
 
 - `0G Chain`: submitted contract is an EVM address and the Explorer URL points to 0G/ChainScan.
 - `0G Storage`: README, repo paths, or generated proof mention 0G Storage, Storage root, Storage indexer, or the 0G TypeScript SDK.
-- `0G Compute`: README or repo evidence mentions 0G Compute, inference, serving broker, Compute provider, or configured Compute env vars.
+- `0G Compute`: README or repo evidence mentions 0G Compute, inference, serving broker, Compute provider, or configured Compute env vars. This counts as claim evidence, but the final passport only marks `0G Compute` verified when the configured 0G Compute endpoint returns a review.
 - `Agent ID`: README or repo evidence mentions Agent ID, agent identity, `.0g`, or agent profiles.
 - `Privacy`: README or repo evidence mentions TEE, sealed inference, encryption, confidentiality, or secure execution.
 

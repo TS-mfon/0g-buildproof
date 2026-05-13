@@ -51,7 +51,7 @@ export async function runBuildProofAgents(projectId: string, submission: Project
       ...(moduleEvidence.storage ? ["0G Storage"] : []),
       ...(moduleEvidence.agentId ? ["Agent ID"] : []),
       ...(moduleEvidence.privacy ? ["Privacy"] : []),
-      ...(flags.hasComputeReview || moduleEvidence.compute ? ["0G Compute"] : [])
+      ...(flags.hasComputeReview ? ["0G Compute"] : [])
     ],
     scores: rawScores,
     capsApplied: [],
